@@ -8,53 +8,57 @@ import java.awt.event.MouseEvent;
 import java.util.Locale;
 
 public class Wordle extends JFrame {
-    private final String word; //The word generated
-    private final Tile[][] letters;//Each letter guess
-    private final Button[] check;//The check button
-    private Tile focusTile;//The tile the user is currently on
+    //The word generated
+    private final String word;
+    //Each letter's tile. 6 rows and 5 columns
+    private final Tile[][] tiles = new Tile[6][5];
+    //The check button
+    private final Button[] checkButtons = new Button[6];
+    //The tile the user is currently on.
+    private Tile focusTile;
 
     public Wordle(String word) {
         //Initialising the word to be equal to the word provided in the Constructor
         this.word = word;
-        //6 Guesses in total with 5 letters in each of them
-        letters = new Tile[6][5];
-        //The check button
-        check = new Button[6];
-
+        //Setting the default size of the frame
+        this.setSize(550, 550);
+        //6 rows and 6 columns.
         this.setLayout(new GridLayout(6, 6));
-        this.setSize(500, 500);
+        //Setting the title
         this.setTitle("Wordle!");
+        //So that the programme stops when the app is closed
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        //Making the Frame visible
         this.setVisible(true);
 
-        //Adding tiles and buttons
+        //Adding tiles to the frame where user inputs letters
         for (int i = 0; i < 6; i++) {
             for(int j = 0; j<5; j++){
-                Tile letter = new Tile(i, j);
-
+                //Tiles are added for 6 rows and 5 columns
+                Tile tile = new Tile(i, j);
                 //Adding event Listeners for each tile.
-                letter.getDocument().addDocumentListener(new DocumentListener() {
+                tile.getDocument().addDocumentListener(new DocumentListener() {
                     @Override
                     public void insertUpdate(DocumentEvent e) {
                         Runnable r = () -> {
-                            if(letter.getText().length() > 0) {
+                            if(tile.getText().length() > 0) {
                                 //Setting all the characters to uppercase so the word isn't case-sensitive
-                                if(Character.isLowerCase(letter.getText().charAt(0))) {
-                                    letter.setText(letter.getText().toUpperCase());
+                                if(Character.isLowerCase(tile.getText().charAt(0))) {
+                                    tile.setText(tile.getText().toUpperCase());
                                 }
-                                if(letter.getLetterNumber()<letters[letter.getLetterNumber()].length-1){
-                                    SwingUtilities.invokeLater(()->letters[letter.getGuess()][letter.getLetterNumber()+1].requestFocus());
-                                    focusTile = letters[letter.getGuess()][letter.getLetterNumber()+1];
+                                if(tile.getLetterNumber()<tiles[tile.getLetterNumber()].length-1){
+                                    SwingUtilities.invokeLater(()->tiles[tile.getGuess()][tile.getLetterNumber()+1].requestFocus());
+                                    focusTile = tiles[tile.getGuess()][tile.getLetterNumber()+1];
                                 }
                             }
 
                             //If the letter is not a letter, we remove the letter
-                            if(letter.getText().matches("[^A-Za-z]")) {
-                                letter.setText(letter.getText().replaceAll("[^A-Za-z]", ""));
+                            if(tile.getText().matches("[^A-Za-z]")) {
+                                tile.setText(tile.getText().replaceAll("[^A-Za-z]", ""));
                             }
                             //If more than two letters are inputted into 1 tile, we remove the letters
-                            if(letter.getText().length() > 1){
-                                letter.setText(letter.getText().substring(1));
+                            if(tile.getText().length() > 1){
+                                tile.setText(tile.getText().substring(1));
                             }
                         };
                         SwingUtilities.invokeLater(r);
@@ -66,17 +70,17 @@ public class Wordle extends JFrame {
                 });
 
                 //When user presses the backspace button
-                letter.getInputMap().put(KeyStroke.getKeyStroke("BACK_SPACE"), "backspaceAction");
-                letter.getActionMap().put("backspaceAction", new BackspaceAction());
+                tile.getInputMap().put(KeyStroke.getKeyStroke("BACK_SPACE"), "backspaceAction");
+                tile.getActionMap().put("backspaceAction", new BackspaceAction());
 
                 //When user presses the enter button
-                letter.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "enterAction");
-                letter.getActionMap().put("enterAction", new EnterAction());
+                tile.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "enterAction");
+                tile.getActionMap().put("enterAction", new EnterAction());
 
-                this.add(letter);
-                letters[i][j] = letter;
+                this.add(tile);
+                tiles[i][j] = tile;
                 if(i>0){
-                    letter.setEnabled(false);
+                    tile.setEnabled(false);
                 }
             }
 
@@ -100,7 +104,7 @@ public class Wordle extends JFrame {
                 public void mouseReleased(MouseEvent e) {
                     super.mouseReleased(e);
                     if(mousePressed){
-                        if(SwingUtilities.isLeftMouseButton(e)){
+                        if(SwingUtilities.isLeftMouseButton(e)||SwingUtilities.isRightMouseButton(e)){
                             onClick(checkButton);
                         }
                     }
@@ -129,11 +133,11 @@ public class Wordle extends JFrame {
             if(i>0){
                 checkButton.setEnabled(false);
             }
-            check[i] = checkButton;
+            checkButtons[i] = checkButton;
             this.add(checkButton);
         }
 
-        focusTile=letters[0][0];
+        focusTile=tiles[0][0];
         SwingUtilities.invokeLater(() -> focusTile.requestFocus());
     }
 
@@ -143,7 +147,7 @@ public class Wordle extends JFrame {
             if(!focusTile.getText().isEmpty() && focusTile.isEnabled()){
                 focusTile.setText("");
             } else if(focusTile.getLetterNumber()>0){
-                focusTile = letters[focusTile.getGuess()][focusTile.getLetterNumber()-1];
+                focusTile = tiles[focusTile.getGuess()][focusTile.getLetterNumber()-1];
                 SwingUtilities.invokeLater(() -> focusTile.requestFocus());
             }
         }
@@ -152,13 +156,13 @@ public class Wordle extends JFrame {
     private class EnterAction extends AbstractAction{
         @Override
         public void actionPerformed(ActionEvent e){
-            onClick(check[focusTile.getGuess()]);
+            onClick(checkButtons[focusTile.getGuess()]);
         }
     }
 
     //Whenever a player clicks on the check button
     private void onClick(Button button){
-        Tile[] letter = letters[button.getGuessNumber()];
+        Tile[] letter = tiles[button.getGuessNumber()];
         StringBuilder builder = new StringBuilder();
 
         //Make a word out of the letters in the tiles
@@ -185,7 +189,7 @@ public class Wordle extends JFrame {
             if(guessValidity[i].equals(Colours.RIGHT)){
                 count++;
             }
-            Tile t = letters[button.getGuessNumber()][i];
+            Tile t = tiles[button.getGuessNumber()][i];
             t.setBackground(guessValidity[i].colour);
             t.setEnabled(false);
             t.setEditable(false);
@@ -197,15 +201,15 @@ public class Wordle extends JFrame {
             JOptionPane.showMessageDialog(null, "You guessed the word!");
         }
 
-        if(button.getGuessNumber() +1>word.length()){
+        if(button.getGuessNumber()+1>word.length()){
             JOptionPane.showMessageDialog(null, "You lost! The word was "+ word +". Better luck next time!");
         }
 
         for(int i =0; i<letter.length; i++){
-            letters[button.getGuessNumber()+1][i].setEnabled(true);
-            check[button.getGuessNumber()+1].setEnabled(true);
+            tiles[button.getGuessNumber()+1][i].setEnabled(true);
+            checkButtons[button.getGuessNumber()+1].setEnabled(true);
         }
-        SwingUtilities.invokeLater(()->letters[button.getGuessNumber()+1][0].requestFocus());
+        SwingUtilities.invokeLater(()->tiles[button.getGuessNumber()+1][0].requestFocus());
     }
 
     private static Colours[] validGuess(String guess, String word) {
