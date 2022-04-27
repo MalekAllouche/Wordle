@@ -30,8 +30,7 @@ public class Main {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        Random r = new Random();
-        Wordle w = new Wordle(targetWords.get(r.nextInt(0, targetWords.size())));
+        Wordle w = new Wordle(getTarget());
         w.setVisible(true);
     }
 
@@ -40,7 +39,7 @@ public class Main {
         Random r = new Random();
         String target = targetWords.get(r.nextInt(targetWords.size()));
         //don't delete this line.
-        System.out.println(target);
+        System.out.println("The random word is: " + target);
         return target;
     }
 }

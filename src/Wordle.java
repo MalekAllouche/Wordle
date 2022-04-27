@@ -14,9 +14,6 @@ public class Wordle extends JFrame {
     private Tile focusTile;//The tile the user is currently on
 
     public Wordle(String word) {
-        //Outputting the word onto the terminal
-        System.out.println("The random word is: " + word);
-
         //Initialising the word to be equal to the word provided in the Constructor
         this.word = word;
         //6 Guesses in total with 5 letters in each of them
@@ -63,13 +60,9 @@ public class Wordle extends JFrame {
                         SwingUtilities.invokeLater(r);
                     }
                     @Override
-                    public void removeUpdate(DocumentEvent e) {
-
-                    }
+                    public void removeUpdate(DocumentEvent e) {}
                     @Override
-                    public void changedUpdate(DocumentEvent e) {
-
-                    }
+                    public void changedUpdate(DocumentEvent e) {}
                 });
 
                 //When user presses the backspace button
@@ -96,7 +89,7 @@ public class Wordle extends JFrame {
                  */
                 @Override
                 public void mousePressed(MouseEvent e) {
-//                    super.mousePressed(e);
+                    super.mousePressed(e);
                     mousePressed=true;
                 }
 
@@ -105,7 +98,7 @@ public class Wordle extends JFrame {
                  */
                 @Override
                 public void mouseReleased(MouseEvent e) {
-//                    super.mouseReleased(e);
+                    super.mouseReleased(e);
                     if(mousePressed){
                         if(SwingUtilities.isLeftMouseButton(e)){
                             onClick(checkButton);
@@ -119,7 +112,7 @@ public class Wordle extends JFrame {
                  */
                 @Override
                 public void mouseEntered(MouseEvent e) {
-//                    super.mouseEntered(e);
+                    super.mouseEntered(e);
                     mousePressed=true;
                 }
 
@@ -128,7 +121,7 @@ public class Wordle extends JFrame {
                  */
                 @Override
                 public void mouseExited(MouseEvent e) {
-//                    super.mouseExited(e);
+                    super.mouseExited(e);
                     mousePressed=false;
                 }
             });
@@ -178,7 +171,7 @@ public class Wordle extends JFrame {
         }
 
         //If the word isn't a valid word, we output an error
-        if(!validWord(builder.toString())) {
+        if(!Main.dictionary.contains(word.toLowerCase(Locale.ROOT))) {
             JOptionPane.showMessageDialog(null, "Invalid Word! Try again");
             return;
         }
@@ -231,9 +224,5 @@ public class Wordle extends JFrame {
             }
         }
         return letterStatus;
-    }
-
-    private static boolean validWord(String word){
-        return Main.dictionary.contains(word.toLowerCase(Locale.ROOT));
     }
 }
