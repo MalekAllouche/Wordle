@@ -14,9 +14,13 @@ public class Wordle extends JFrame {
     private final Tile[][] tiles = new Tile[6][5];
     //The check button
     private final Button[] checkButtons = new Button[6];
-    //The tile the user is currently on.
+    //The tile the user is currently on. This was made to make sure we know where the user is
+    //to make this app just like the original wordle
     private Tile focusTile;
 
+    /**
+     * This is the constructor function which is the main code for the game
+     * @param word The word which is to be guessed*/
     public Wordle(String word) {
         //Initialising the word to be equal to the word provided in the Constructor
         this.word = word;
@@ -36,8 +40,10 @@ public class Wordle extends JFrame {
             for(int j = 0; j<5; j++){
                 //Tiles are added for 6 rows and 5 columns
                 Tile tile = new Tile(i, j);
-                //Adding event Listeners for each tile.
+                //Adding event Listeners for each tile. This makes it easier to insert letters and
+                //delete them like in the original wordle
                 tile.getDocument().addDocumentListener(new DocumentListener() {
+                    //This method updates whenever there was an insert into the game
                     @Override
                     public void insertUpdate(DocumentEvent e) {
                         Runnable r = () -> {
