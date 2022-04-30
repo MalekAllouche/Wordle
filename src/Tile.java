@@ -3,17 +3,17 @@ import java.awt.*;
 
 public class Tile extends JTextField {
     private final int guess;
-    private final int letterNumber;
+    private final int tileNumber;
     public int getGuess(){
         return guess;
     }
-    public int getLetterNumber(){
-        return letterNumber;
+    public int getTileNumber(){
+        return tileNumber;
     }
 
-    public Tile(int guess, int letterNumber){
+    public Tile(int guess, int tileNumber){
         this.guess = guess;
-        this.letterNumber = letterNumber;
+        this.tileNumber = tileNumber;
         //TODO: Add a font here:
 //        this.setFont(new Font("Helvetica", Font.BOLD, 30));
         //The background is set to white

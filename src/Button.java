@@ -3,15 +3,15 @@ import javax.swing.*;
 /**
  * This is the class which makes and implements the "Check" Button*/
 public class Button extends JButton {
-    private final int guessNumber;
+    private final int row;
 
     //Constructor method to initialise the button
-    public Button(int guessNumber){
-        this.guessNumber = guessNumber;
+    public Button(int row){
+        this.row = row;
         this.setText("Check");
     }
 
-    public int getGuessNumber() {
-        return guessNumber;
+    public int getRow() {
+        return row;
     }
 }
