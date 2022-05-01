@@ -37,7 +37,7 @@ public class Wordle extends JFrame {
 
         //Adding tiles to the frame where user inputs letters
         for (int i = 0; i < 6; i++) {
-            for(int j = 0; j<5; j++){
+            for(int j = 0; j < 5; j++){
                 //Tiles are added for 6 rows and 5 columns
                 Tile tile = new Tile(i, j);
                 //Adding event Listeners for each tile. This makes it easier to insert letters and
@@ -99,19 +99,39 @@ public class Wordle extends JFrame {
                 //Adding tiles into the frame
                 this.add(tile);
                 tiles[i][j] = tile;
+                //Disabling all the tiles below the first row at the beginning so that the user can't edit tiles
+                //of the rows they are not on
+                if(i>0){
+                    tile.setEnabled(false);
+                }
             }
 
-            //Adding the check buttons
+            //Adding the check buttons for each row
             Button checkButton = new Button(i);
+            //Adding MouseListener to the check buttons to make sure we run the code when the
+            //check button is clicked
             checkButton.addMouseListener(new MouseAdapter() {
-                boolean mousePressed = false;
+                //Boolean to check when the mouse is clicked
+                boolean buttonClicked = false;
+
                 /**
+                 * This method is run when the mouse is being entered on the check button
                  * @param e the event to be processed
                  */
                 @Override
-                public void mousePressed(MouseEvent e) {
-                    super.mousePressed(e);
-                    mousePressed=true;
+                public void mouseEntered(MouseEvent e) {
+                    //When the mouse is entered where the button is, we set the boolean to true
+                    buttonClicked=true;
+                }
+
+                /**
+                 * This method is run when the mouse is being exited from the check button
+                 * @param e the event to be processed
+                 */
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    //When the mouse is exited from there, we set the boolean to false
+                    buttonClicked=false;
                 }
 
                 /**
@@ -120,40 +140,24 @@ public class Wordle extends JFrame {
                 @Override
                 public void mouseReleased(MouseEvent e) {
                     super.mouseReleased(e);
-                    if(mousePressed){
-                        if(SwingUtilities.isLeftMouseButton(e)||SwingUtilities.isRightMouseButton(e)){
-                            checkWord(checkButton);
-                        }
+                    //If button is clicked, we check the word guessed
+                    if(buttonClicked){
+                        checkWord(checkButton);
                     }
-                    mousePressed = false;
-                }
-
-                /**
-                 * @param e the event to be processed
-                 */
-                @Override
-                public void mouseEntered(MouseEvent e) {
-                    super.mouseEntered(e);
-                    mousePressed=true;
-                }
-
-                /**
-                 * @param e the event to be processed
-                 */
-                @Override
-                public void mouseExited(MouseEvent e) {
-                    super.mouseExited(e);
-                    mousePressed=false;
+                    //And then set the buttonClicked boolean to false
+                    buttonClicked = false;
                 }
             });
 
+            //Disabling all buttons except for the one we are currently on
             if(i>0){
                 checkButton.setEnabled(false);
             }
+            //Adding the buttons onto the frame
             checkButtons[i] = checkButton;
             this.add(checkButton);
         }
-
+        //Setting our current tile to the first tile where the user starts typing
         currentTile=tiles[0][0];
         SwingUtilities.invokeLater(() -> currentTile.requestFocus());
     }
@@ -256,12 +260,14 @@ public class Wordle extends JFrame {
     }
 
     private static Colours[] validGuess(String guess, String word) {
-        Colours[] letterStatus = new Colours[guess.length()];
+        Colours[] letterStatus = new Colours[5];
         //Loop over each letter and set colours according to the validity of them
-        for(int i = 0; i<guess.length(); i++){
+        for(int i = 0; i<5; i++){
+            //The strings below stores the characters of the actual word's letter and the guessed word's letter
             String guessLetter = String.valueOf(guess.charAt(i)).toLowerCase(Locale.ROOT);
             String validLetter = String.valueOf(word.charAt(i)).toLowerCase(Locale.ROOT);
 
+            //Then, the colours are output on the user's device
             if(guessLetter.equals(validLetter)){
                 letterStatus[i] = Colours.RIGHT;
             } else if(word.contains(guessLetter)){
