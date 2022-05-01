@@ -6,7 +6,6 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class Main {
-
     //a list of all possible 5-letter words in English
     public static HashSet<String> dictionary = new HashSet<>();
 
@@ -30,7 +29,9 @@ public class Main {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+        //Running the Wordle created separately
         Wordle w = new Wordle(getTarget());
+        //Making it visible
         w.setVisible(true);
     }
 

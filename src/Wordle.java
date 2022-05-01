@@ -57,11 +57,11 @@ public class Wordle extends JFrame {
                                 //If we haven't reached the end of the word, we keep on changing the focus to
                                 //the next tile to help user enter their word without manually changing the tile each
                                 //time. This also only happens if the input is a valid letter
-                                if(tile.getTileNumber()<4 && !tile.getText().matches("[^A-Za-z]")){
+                                if(tile.getColumn()<4 && !tile.getText().matches("[^A-Za-z]")){
                                     //We then change the current tile to the next tile for seamlessly helping user
                                     //change their tiles
-                                    currentTile = tiles[tile.getGuess()][tile.getTileNumber()+1];
-                                    SwingUtilities.invokeLater(()->tiles[tile.getGuess()][tile.getTileNumber()+1].requestFocus());
+                                    currentTile = tiles[tile.getRow()][tile.getColumn()+1];
+                                    SwingUtilities.invokeLater(()->tiles[tile.getRow()][tile.getColumn()+1].requestFocus());
                                 }
                             }
 
@@ -172,10 +172,10 @@ public class Wordle extends JFrame {
             //If the current tile has a letter in it, and we press delete, the letter on the tile is removed.
             if(!currentTile.getText().isEmpty() && currentTile.isEnabled()){
                 currentTile.setText("");
-            } else if(currentTile.getTileNumber()>0){
+            } else if(currentTile.getColumn()>0){
                 //Else if, the current tile is empty, we shift the focus to the tile before it and delete
                 //the letter in the previous tile
-                currentTile = tiles[currentTile.getGuess()][currentTile.getTileNumber()-1];
+                currentTile = tiles[currentTile.getRow()][currentTile.getColumn()-1];
                 currentTile.setText("");
                 SwingUtilities.invokeLater(() -> currentTile.requestFocus());
             }
@@ -189,7 +189,7 @@ public class Wordle extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
             //When the return button is pressed, we check the word that was input into the tiles.
-            checkWord(checkButtons[currentTile.getGuess()]);
+            checkWord(checkButtons[currentTile.getRow()]);
         }
     }
 
@@ -267,7 +267,7 @@ public class Wordle extends JFrame {
             String guessLetter = String.valueOf(guess.charAt(i)).toLowerCase(Locale.ROOT);
             String validLetter = String.valueOf(word.charAt(i)).toLowerCase(Locale.ROOT);
 
-            //Then, the colours are output on the user's device
+            //Then, the colours are output on the user's device based on their guesses
             if(guessLetter.equals(validLetter)){
                 letterStatus[i] = Colours.RIGHT;
             } else if(word.contains(guessLetter)){
