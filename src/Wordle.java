@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Arrays;
 import java.util.Locale;
 
 public class Wordle extends JFrame {
@@ -37,7 +38,7 @@ public class Wordle extends JFrame {
 
         //Adding tiles to the frame where user inputs letters
         for (int i = 0; i < 6; i++) {
-            for(int j = 0; j < 5; j++){
+            for(int j = 0; j < 5; j++) {
                 //Tiles are added for 6 rows and 5 columns
                 Tile tile = new Tile(i, j);
                 //Adding event Listeners for each tile. This makes it easier to insert letters and
@@ -57,7 +58,7 @@ public class Wordle extends JFrame {
                                 //If we haven't reached the end of the word, we keep on changing the focus to
                                 //the next tile to help user enter their word without manually changing the tile each
                                 //time. This also only happens if the input is a valid letter
-                                if(tile.getColumn()<4 && !tile.getText().matches("[^A-Za-z]")){
+                                if(tile.getColumn()<4 && !tile.getText().matches("[^A-Za-z]")) {
                                     //We then change the current tile to the next tile for seamlessly helping user
                                     //change their tiles
                                     currentTile = tiles[tile.getRow()][tile.getColumn()+1];
@@ -73,7 +74,7 @@ public class Wordle extends JFrame {
                             }
                             //If more than one letters are inputted into 1 tile, we remove the letters and only keep
                             //the new letter inputted
-                            if(tile.getText().length() > 1){
+                            if(tile.getText().length() > 1) {
                                 tile.setText(tile.getText().substring(1));
                             }
                         };
@@ -88,12 +89,18 @@ public class Wordle extends JFrame {
                     public void changedUpdate(DocumentEvent e) {}
                 });
 
-                //When user presses the backspace button, we run the delete button action
+                //When user presses the backspace button, we run the delete button action.
+                //Adding a binding for the Back_Space keyStroke to the deleteButton actionMapKey.
+                // This is added to each tile and implemented in the next line
                 tile.getInputMap().put(KeyStroke.getKeyStroke("BACK_SPACE"), "deleteButton");
+                //Adds a binding for key to action. DeleteButton method is called here which is implemented below
                 tile.getActionMap().put("deleteButton", new DeleteButton());
 
                 //When user presses the return button, we run the return button action
+                //Adding a binding for keyStroke Enter to an actionMapKey which is used in the next line
                 tile.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "returnButton");
+                //Adds a binding for returnButton key to implement the ReturnButton method.
+                //ReturnButton method is called here which is implemented below
                 tile.getActionMap().put("returnButton", new ReturnButton());
 
                 //Adding tiles into the frame
@@ -135,11 +142,11 @@ public class Wordle extends JFrame {
                 }
 
                 /**
+                 * This method is run when the mouse has been released on the check button
                  * @param e the event to be processed
                  */
                 @Override
                 public void mouseReleased(MouseEvent e) {
-                    super.mouseReleased(e);
                     //If button is clicked, we check the word guessed
                     if(buttonClicked){
                         checkWord(checkButton);
@@ -150,7 +157,7 @@ public class Wordle extends JFrame {
             });
 
             //Disabling all buttons except for the one we are currently on
-            if(i>0){
+            if(i>0) {
                 checkButton.setEnabled(false);
             }
             //Adding the buttons onto the frame
@@ -168,11 +175,11 @@ public class Wordle extends JFrame {
          * @param e is the action event each time the delete button is pressed
          * */
         @Override
-        public void actionPerformed(ActionEvent e){
+        public void actionPerformed(ActionEvent e) {
             //If the current tile has a letter in it, and we press delete, the letter on the tile is removed.
-            if(!currentTile.getText().isEmpty() && currentTile.isEnabled()){
+            if(!currentTile.getText().isEmpty() && currentTile.isEnabled()) {
                 currentTile.setText("");
-            } else if(currentTile.getColumn()>0){
+            } else if(currentTile.getColumn()>0) {
                 //Else if, the current tile is empty, we shift the focus to the tile before it and delete
                 //the letter in the previous tile
                 currentTile = tiles[currentTile.getRow()][currentTile.getColumn()-1];
@@ -182,7 +189,7 @@ public class Wordle extends JFrame {
         }
     }
 
-    private class ReturnButton extends AbstractAction{
+    private class ReturnButton extends AbstractAction {
         /**
          * This method is used whenever the return button is pressed
          * @param e The action event each time the return button is pressed*/
@@ -193,20 +200,40 @@ public class Wordle extends JFrame {
         }
     }
 
+    private static Colours[] validGuess(String guess, String word) {
+        Colours[] letterStatus = new Colours[5];
+        //Loop over each letter and set colours according to the validity of them
+        for(int i = 0; i<5; i++) {
+            //The strings below stores the characters of the actual word's letter and the guessed word's letter
+            String guessLetter = String.valueOf(guess.charAt(i)).toLowerCase(Locale.ROOT);
+            String validLetter = String.valueOf(word.charAt(i)).toLowerCase(Locale.ROOT);
+
+            //Then, the colours are output on the user's device based on their guesses
+            if(guessLetter.equals(validLetter)) {
+                letterStatus[i] = Colours.RIGHT;
+            } else if(word.contains(guessLetter)) {
+                letterStatus[i] = Colours.WRONG;
+            } else {
+                letterStatus[i] = Colours.INCORRECT;
+            }
+        }
+        return letterStatus;
+    }
+
     //Whenever a player clicks on the check button or presses the return key, this method is run
-    private void checkWord(Button button){
+    private void checkWord(Button button) {
         //This array stores the letters of the guessed word
         Tile[] letters = tiles[button.getRow()];
 
         //Using a string builder to make a string from the letters
         StringBuilder guessedWord = new StringBuilder();
 
-        //Keeps track of the number of valid letters in the guessed word
+        //Keeps track of the number of correct letters in the guessed word
         int numOfCorrectLetters = 0;
 
         //Making a word out of the letters in the tiles
         for (Tile t: letters) {
-            if(!t.getText().isEmpty()){
+            if(!t.getText().isEmpty()) {
                 guessedWord.append(t.getText());
                 continue;
             }
@@ -223,9 +250,9 @@ public class Wordle extends JFrame {
         }
 
         //Then, we set colours for each letter according to its validity
-        for(int i = 0; i<letters.length; i++){
+        for(int i = 0; i<letters.length; i++) {
             //If the letter guessed was right, we increment the number of correct letters
-            if(guessValidity[i].equals(Colours.RIGHT)){
+            if(guessValidity[i].equals(Colours.RIGHT)) {
                 numOfCorrectLetters++;
             }
             //We then get the current row we are on and set the background of the letters according
@@ -238,44 +265,24 @@ public class Wordle extends JFrame {
         }
 
         //When numOfCorrectLetters are 5, that means the player has won. We stop the game and output the message
-        if(numOfCorrectLetters == 5){
+        if(numOfCorrectLetters == 5) {
             JOptionPane.showMessageDialog(null, "You guessed the word!");
             this.setEnabled(false);
         }
 
         //When the last check button is pressed and the user hasn't won, it means they've lost.
         //We then output the word as well as the message
-        if(button.getRow()+1>5){
+        if(button.getRow()+1>5) {
             JOptionPane.showMessageDialog(null, "You lost! The word was "+ word +". Better luck next time!");
             this.setEnabled(false);
             return;
         }
 
         //When the user has gone through one guess, and got it wrong, we enable the next line of button and tiles
-        for(int i =0; i<letters.length; i++){
+        for(int i =0; i<letters.length; i++) {
             tiles[button.getRow()+1][i].setEnabled(true);
             checkButtons[button.getRow()+1].setEnabled(true);
         }
         SwingUtilities.invokeLater(()->tiles[button.getRow()+1][0].requestFocus());
-    }
-
-    private static Colours[] validGuess(String guess, String word) {
-        Colours[] letterStatus = new Colours[5];
-        //Loop over each letter and set colours according to the validity of them
-        for(int i = 0; i<5; i++){
-            //The strings below stores the characters of the actual word's letter and the guessed word's letter
-            String guessLetter = String.valueOf(guess.charAt(i)).toLowerCase(Locale.ROOT);
-            String validLetter = String.valueOf(word.charAt(i)).toLowerCase(Locale.ROOT);
-
-            //Then, the colours are output on the user's device based on their guesses
-            if(guessLetter.equals(validLetter)){
-                letterStatus[i] = Colours.RIGHT;
-            } else if(word.contains(guessLetter)){
-                letterStatus[i] = Colours.WRONG;
-            } else {
-                letterStatus[i] = Colours.INCORRECT;
-            }
-        }
-        return letterStatus;
     }
 }
